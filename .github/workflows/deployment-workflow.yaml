@@ -1,0 +1,38 @@
+name: Deploy Application
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ensure_build:
+    name: Ensure the application builts successfully
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: "main"
+      - name: Setup java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: 8
+          cache: maven
+      - name: Build application with maven
+        run: mvn package
+  deploy_to_heroku:
+    runs-on: ubuntu-latest
+    name: Deploy application to heroku
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          ref: "main"
+      - name: Deploy app
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: "cheap-lib"
+          heroku_email: "hellojonas@gmail.com"
